@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#111111" />
+  <title>HanGPT</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <div id="auth-overlay" class="auth-overlay">
+    <form id="auth-form" class="auth-card">
+      <div class="brand-mark">H</div>
+      <h1>HanGPT</h1>
+      <p>Enter the APP_TOKEN configured on your Cloudflare Worker.</p>
+      <input id="auth-token" type="password" autocomplete="current-password" placeholder="APP_TOKEN" required />
+      <button class="primary wide" type="submit">Open workspace</button>
+      <div id="auth-error" class="form-error"></div>
+    </form>
+  </div>
+
+  <div id="app" class="app hidden">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-head">
+        <button class="brand-button" data-view="chat"><span class="brand-mark small">H</span><strong>HanGPT</strong></button>
+        <button id="close-sidebar" class="icon-btn mobile-only" aria-label="Close menu">×</button>
+      </div>
+      <button id="new-chat" class="new-chat"><span>＋</span> New chat</button>
+      <nav class="main-nav" aria-label="Workspace">
+        <button class="nav-item active" data-view="chat"><span>◈</span> Chat</button>
+        <button class="nav-item" data-view="projects"><span>▱</span> Projects</button>
+        <button class="nav-item" data-view="code"><span>⌘</span> Code</button>
+        <button class="nav-item" data-view="plugins"><span>◇</span> Plugins</button>
+      </nav>
+      <div class="history-head"><span>Chats</span><button id="refresh-chats" class="icon-btn" title="Refresh">↻</button></div>
+      <div id="conversation-list" class="conversation-list"></div>
+      <div class="sidebar-foot">
+        <div class="status-dot"></div>
+        <div><strong>Personal workspace</strong><small>Cloudflare + OpenAI</small></div>
+        <button id="logout" class="icon-btn" title="Forget token">↪</button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button id="open-sidebar" class="icon-btn mobile-only" aria-label="Open menu">☰</button>
+          <h2 id="view-title">Chat</h2>
+        </div>
+        <div id="chat-controls" class="chat-controls">
+          <select id="project-select" title="Project"><option value="">No project</option></select>
+          <select id="model-select" title="Model">
+            <option value="gpt-5.6">GPT-5.6</option>
+            <option value="gpt-5.6-sol">GPT-5.6 Sol</option>
+            <option value="gpt-5.6-terra">GPT-5.6 Terra</option>
+            <option value="gpt-5.6-luna">GPT-5.6 Luna</option>
+          </select>
+          <select id="reasoning-select" title="Reasoning effort">
+            <option value="low">Low reasoning</option>
+            <option value="medium" selected>Medium reasoning</option>
+            <option value="high">High reasoning</option>
+            <option value="xhigh">Extra-high reasoning</option>
+          </select>
+          <label class="toggle"><input id="web-search" type="checkbox" /><span></span><em>Web</em></label>
+        </div>
+      </header>
+
+      <section id="view-chat" class="view active">
+        <div id="messages" class="messages"></div>
+        <div id="empty-chat" class="empty-chat">
+          <div class="brand-mark hero">H</div>
+          <h1>What can I help with?</h1>
+          <div class="suggestions">
+            <button data-prompt="Build a clear implementation plan for my idea">Plan a build</button>
+            <button data-prompt="Help me debug a coding problem step by step">Debug code</button>
+            <button data-prompt="Research this topic using web search and summarize the key findings">Research</button>
+            <button data-prompt="Turn my rough notes into an actionable project">Organize a project</button>
+          </div>
+        </div>
+        <form id="composer" class="composer-wrap">
+          <div class="composer">
+            <textarea id="message-input" rows="1" placeholder="Message HanGPT" aria-label="Message"></textarea>
+            <div class="composer-row">
+              <span id="context-label" class="context-label">General chat</span>
+              <button id="send-message" class="send-btn" type="submit" aria-label="Send">↑</button>
+            </div>
+          </div>
+          <small>HanGPT can make mistakes. Verify important information.</small>
+        </form>
+      </section>
+
+      <section id="view-projects" class="view page-view">
+        <div class="page-header"><div><p class="eyebrow">Workspace memory</p><h1>Projects</h1><p>Group instructions, chats and files around ongoing work.</p></div></div>
+        <div class="two-column">
+          <form id="project-form" class="panel form-panel">
+            <h3>Create project</h3>
+            <label>Name<input id="project-name" required maxlength="120" placeholder="Website redesign" /></label>
+            <label>Instructions<textarea id="project-instructions" rows="7" placeholder="Goals, constraints, preferred stack, tone, conventions…"></textarea></label>
+            <button class="primary" type="submit">Create project</button>
+          </form>
+          <div><div class="section-title"><h3>Your projects</h3><span id="project-count" class="badge">0</span></div><div id="project-grid" class="project-grid"></div></div>
+        </div>
+      </section>
+
+      <section id="view-code" class="view code-view">
+        <div class="code-toolbar">
+          <select id="code-project-select"><option value="">Select a project</option></select>
+          <button id="new-file" class="secondary">＋ File</button>
+          <span id="code-status" class="muted">Choose a project to start</span>
+        </div>
+        <div class="code-layout">
+          <aside class="file-panel panel">
+            <div class="section-title"><h3>Files</h3><button id="refresh-files" class="icon-btn">↻</button></div>
+            <div id="file-list" class="file-list"></div>
+          </aside>
+          <div class="editor-panel panel">
+            <div class="editor-head"><input id="file-path" placeholder="path/to/file.ts" /><div><button id="delete-file" class="danger ghost">Delete</button><button id="save-file" class="secondary">Save</button></div></div>
+            <textarea id="file-editor" spellcheck="false" placeholder="Select or create a file"></textarea>
+          </div>
+          <aside class="agent-panel panel">
+            <div class="section-title"><div><h3>Code agent</h3><small>Can read and edit project files</small></div></div>
+            <div id="code-log" class="code-log"><div class="agent-empty">Ask the agent to build, refactor, debug, or inspect this project.</div></div>
+            <form id="code-form" class="agent-composer"><textarea id="code-prompt" rows="4" placeholder="Implement the login page and update the existing files…"></textarea><div><label class="toggle"><input id="code-web-search" type="checkbox" /><span></span><em>Web</em></label><button class="primary" type="submit">Run agent</button></div></form>
+          </aside>
+        </div>
+      </section>
+
+      <section id="view-plugins" class="view page-view">
+        <div class="page-header"><div><p class="eyebrow">External tools</p><h1>Plugins</h1><p>Register HTTPS webhook/API endpoints, then call them without storing their secret headers.</p></div></div>
+        <div class="two-column plugins-layout">
+          <form id="plugin-form" class="panel form-panel">
+            <h3>Add plugin</h3>
+            <label>Name<input id="plugin-name" required placeholder="My automation" /></label>
+            <label>HTTPS endpoint<input id="plugin-url" required type="url" placeholder="https://api.example.com/hook" /></label>
+            <label>Description<textarea id="plugin-description" rows="4" placeholder="What this endpoint does"></textarea></label>
+            <button class="primary" type="submit">Add plugin</button>
+          </form>
+          <div><div class="section-title"><h3>Installed</h3><span id="plugin-count" class="badge">0</span></div><div id="plugin-list" class="plugin-list"></div></div>
+        </div>
+        <div id="plugin-runner" class="panel plugin-runner hidden">
+          <div class="section-title"><div><p class="eyebrow">Invoke</p><h3 id="runner-name">Plugin</h3></div><button id="close-runner" class="icon-btn">×</button></div>
+          <div class="runner-grid">
+            <label>JSON payload<textarea id="plugin-payload" rows="8">{}</textarea></label>
+            <label>Headers for this call only<textarea id="plugin-headers" rows="8">{}</textarea></label>
+          </div>
+          <button id="run-plugin" class="primary">Call endpoint</button>
+          <pre id="plugin-result" class="result-box">Result will appear here.</pre>
+        </div>
+      </section>
+    </main>
+    <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+  </div>
+  <div id="toast" class="toast"></div>
+  <script type="module" src="/app.js"></script>
+</body>
+</html>

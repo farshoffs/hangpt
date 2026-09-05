@@ -1,0 +1,3 @@
+OPENAI_API_KEY=sk-your-key-here
+APP_TOKEN=replace-with-a-long-random-token
+OPENAI_MODEL=gpt-5.6
