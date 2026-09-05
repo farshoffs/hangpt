@@ -112,14 +112,16 @@ export async function removeFromIndex(env: Env, key: string, id: string): Promis
 
 export async function saveProject(env: Env, project: Project): Promise<void> {
   await putJson(env, `project:${project.id}`, project);
-  const meta: ProjectMeta = { ...project, files: undefined as never, fileNames: Object.keys(project.files).sort() };
-  delete (meta as any).files; await upsertIndex(env, "projects:index", meta);
+  const { files, ...rest } = project;
+  const meta: ProjectMeta = { ...rest, fileNames: Object.keys(files).sort() };
+  await upsertIndex(env, "projects:index", meta);
 }
 
 export async function saveConversation(env: Env, conversation: Conversation): Promise<void> {
   await putJson(env, `conversation:${conversation.id}`, conversation);
-  const meta: ConversationMeta = { ...conversation, messages: undefined as never, messageCount: conversation.messages.length };
-  delete (meta as any).messages; await upsertIndex(env, "conversations:index", meta);
+  const { messages, ...rest } = conversation;
+  const meta: ConversationMeta = { ...rest, messageCount: messages.length };
+  await upsertIndex(env, "conversations:index", meta);
 }
 
 export function newConversation(projectId: string | null, mode: "chat" | "code", title = "New chat"): Conversation {
@@ -128,10 +130,23 @@ export function newConversation(projectId: string | null, mode: "chat" | "code",
 
 function bytesToB64(bytes: Uint8Array): string { let s = ""; for (const b of bytes) s += String.fromCharCode(b); return btoa(s); }
 function b64ToBytes(value: string): Uint8Array { const raw = atob(value); return Uint8Array.from(raw, (c) => c.charCodeAt(0)); }
+function toArrayBuffer(bytes: Uint8Array): ArrayBuffer { return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer; }
 async function cryptoKey(env: Env): Promise<CryptoKey> { if (!env.MASTER_KEY) throw new Error("MASTER_KEY is not configured"); const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(env.MASTER_KEY)); return crypto.subtle.importKey("raw", digest, "AES-GCM", false, ["encrypt", "decrypt"]); }
 
-export async function encryptSecret(env: Env, value: string): Promise<{ ciphertext: string; iv: string }> { const key = await cryptoKey(env); const iv = crypto.getRandomValues(new Uint8Array(12)); const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, new TextEncoder().encode(value)); return { ciphertext: bytesToB64(new Uint8Array(encrypted)), iv: bytesToB64(iv) }; }
-export async function decryptSecret(env: Env, record: SecretRecord): Promise<string> { const key = await cryptoKey(env); const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: b64ToBytes(record.iv) }, key, b64ToBytes(record.ciphertext)); return new TextDecoder().decode(decrypted); }
+export async function encryptSecret(env: Env, value: string): Promise<{ ciphertext: string; iv: string }> {
+  const key = await cryptoKey(env);
+  const iv = crypto.getRandomValues(new Uint8Array(12));
+  const plaintext = new TextEncoder().encode(value);
+  const encrypted = await crypto.subtle.encrypt({ name: "AES-GCM", iv: toArrayBuffer(iv) }, key, toArrayBuffer(plaintext));
+  return { ciphertext: bytesToB64(new Uint8Array(encrypted)), iv: bytesToB64(iv) };
+}
+export async function decryptSecret(env: Env, record: SecretRecord): Promise<string> {
+  const key = await cryptoKey(env);
+  const iv = b64ToBytes(record.iv);
+  const ciphertext = b64ToBytes(record.ciphertext);
+  const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: toArrayBuffer(iv) }, key, toArrayBuffer(ciphertext));
+  return new TextDecoder().decode(decrypted);
+}
 
 export async function putProjectSecret(env: Env, projectId: string, name: string, value: string): Promise<void> {
   const key = `project:${projectId}:secrets`; const records = (await getJson<SecretRecord[]>(env, key)) || []; const encrypted = await encryptSecret(env, value); const now = new Date().toISOString(); const existing = records.find((r) => r.name === name); const record: SecretRecord = { name, ...encrypted, createdAt: existing?.createdAt || now, updatedAt: now }; await putJson(env, key, [record, ...records.filter((r) => r.name !== name)]);
