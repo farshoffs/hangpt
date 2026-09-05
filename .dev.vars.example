@@ -1,3 +1,7 @@
 OPENAI_API_KEY=sk-your-key-here
 APP_TOKEN=replace-with-a-long-random-token
 OPENAI_MODEL=gpt-5.6
+# Optional advanced features
+MASTER_KEY=replace-with-another-long-random-value
+GITHUB_TOKEN=github-token-with-repo-and-actions-access
+CF_ACCESS_REQUIRED=false

@@ -1,0 +1,50 @@
+name: HanGPT Controlled Execution
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Allowed task to execute
+        required: true
+        type: choice
+        options:
+          - typecheck
+          - test
+          - build
+          - lint
+
+permissions:
+  contents: read
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install dependencies
+        run: npm install
+      - name: Run requested task
+        shell: bash
+        run: |
+          case "${{ inputs.task }}" in
+            typecheck)
+              npm run typecheck
+              ;;
+            test)
+              npm test --if-present
+              ;;
+            build)
+              npm run build --if-present
+              ;;
+            lint)
+              npm run lint --if-present
+              ;;
+            *)
+              echo "Unsupported task" >&2
+              exit 2
+              ;;
+          esac

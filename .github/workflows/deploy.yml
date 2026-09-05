@@ -20,6 +20,8 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       APP_TOKEN: ${{ secrets.APP_TOKEN }}
+      MASTER_KEY: ${{ secrets.MASTER_KEY }}
+      GITHUB_TOKEN_HANGPT: ${{ secrets.HANGPT_GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,3 +43,9 @@ jobs:
       - name: Set app access token
         if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' && env.APP_TOKEN != '' }}
         run: printf '%s' "$APP_TOKEN" | npx wrangler secret put APP_TOKEN --name hangpt
+      - name: Set encryption master key
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' && env.MASTER_KEY != '' }}
+        run: printf '%s' "$MASTER_KEY" | npx wrangler secret put MASTER_KEY --name hangpt
+      - name: Set GitHub integration token
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' && env.GITHUB_TOKEN_HANGPT != '' }}
+        run: printf '%s' "$GITHUB_TOKEN_HANGPT" | npx wrangler secret put GITHUB_TOKEN --name hangpt

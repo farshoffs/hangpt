@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="dark" />
+  <title>HanGPT Advanced</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body{overflow:auto;background:#171717}.advanced-shell{max-width:1180px;margin:auto;padding:28px 18px 80px}.advanced-top{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:24px}.advanced-top h1{margin:0}.advanced-top a{color:#ddd;text-decoration:none}.advanced-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.advanced-card{padding:18px}.advanced-card h2{margin:0 0 4px;font-size:18px}.advanced-card>p{color:#8d8d8d;font-size:12px;margin:0 0 16px}.advanced-card form{display:grid;gap:10px}.advanced-card input,.advanced-card textarea,.advanced-card select{background:#1b1b1b;border:1px solid #3b3b3b;border-radius:9px;padding:10px;width:100%}.advanced-card textarea{resize:vertical}.row{display:flex;gap:8px}.row>*{flex:1}.stack{display:grid;gap:8px;margin-top:12px}.item{background:#1c1c1c;border:1px solid #333;border-radius:10px;padding:10px;font-size:12px}.item strong{display:block}.item small{color:#777}.capabilities{display:flex;gap:6px;flex-wrap:wrap}.cap{font-size:10px;padding:5px 8px;border-radius:20px;background:#2d2d2d}.output{background:#101010;border:1px solid #303030;border-radius:10px;padding:12px;white-space:pre-wrap;word-break:break-word;max-height:300px;overflow:auto;font-size:11px}.media-preview img{max-width:100%;border-radius:10px}.notice{font-size:11px;color:#999}.danger-text{color:#f0a0a0}@media(max-width:780px){.advanced-grid{grid-template-columns:1fr}.row{flex-direction:column}}
+  </style>
+</head>
+<body>
+  <main class="advanced-shell">
+    <div class="advanced-top"><div><p class="eyebrow">HanGPT 1.0</p><h1>Advanced workspace</h1></div><a class="secondary" href="/">← Back to Chat</a></div>
+    <div id="caps" class="capabilities"></div>
+    <p class="notice">This page uses the same APP_TOKEN stored in your current browser session. Sensitive values are never displayed after saving.</p>
+
+    <div class="advanced-grid">
+      <section class="panel advanced-card"><h2>Memory</h2><p>Save durable facts and project context that HanGPT injects into future chats.</p>
+        <form id="memory-form"><textarea id="memory-text" rows="3" placeholder="Remember that I prefer TypeScript and Cloudflare Workers." required></textarea><div class="row"><select id="memory-scope"><option value="global">Global memory</option><option value="project">Project memory</option></select><select id="memory-project"><option value="">Select project</option></select></div><button class="primary" type="submit">Save memory</button></form><div id="memory-list" class="stack"></div>
+      </section>
+
+      <section class="panel advanced-card"><h2>Agents</h2><p>Create reusable assistants with their own instructions, model and tool policy.</p>
+        <form id="agent-form"><input id="agent-name" placeholder="Senior Engineer" required /><textarea id="agent-instructions" rows="4" placeholder="Act as a senior engineer. Inspect existing code before editing." required></textarea><div class="row"><select id="agent-model"><option>gpt-5.6</option><option>gpt-5.6-sol</option><option>gpt-5.6-terra</option><option>gpt-5.6-luna</option></select><select id="agent-reasoning"><option>low</option><option selected>medium</option><option>high</option><option>xhigh</option><option>max</option></select></div><label class="notice"><input id="agent-web" type="checkbox" /> Enable web search tool</label><button class="primary" type="submit">Create agent</button></form><div id="agent-list" class="stack"></div>
+      </section>
+
+      <section class="panel advanced-card"><h2>Files & media</h2><p>Upload files, transcribe audio, generate images, and create speech.</p>
+        <form id="upload-form"><div class="row"><input id="upload-file" type="file" required /><select id="upload-project"><option value="">No project</option></select></div><button class="secondary" type="submit">Upload file</button></form>
+        <form id="image-form" style="margin-top:14px"><textarea id="image-prompt" rows="2" placeholder="Describe an image to generate"></textarea><button class="secondary" type="submit">Generate image</button></form>
+        <form id="speech-form"><textarea id="speech-text" rows="2" placeholder="Text to speak"></textarea><div class="row"><select id="speech-voice"><option>alloy</option><option>verse</option><option>coral</option></select><button class="secondary" type="submit">Generate speech</button></div></form>
+        <form id="transcribe-form"><input id="audio-file" type="file" accept="audio/*" /><button class="secondary" type="submit">Transcribe audio</button></form>
+        <div id="media-output" class="output">Media results appear here.</div><div id="upload-list" class="stack"></div>
+      </section>
+
+      <section class="panel advanced-card"><h2>Project integrations</h2><p>Link GitHub, choose defaults, save encrypted project secrets, and dispatch controlled CI tasks.</p>
+        <select id="ops-project"><option value="">Select project</option></select>
+        <form id="settings-form" style="margin-top:10px"><div class="row"><input id="github-repo" placeholder="owner/repository" /><input id="github-branch" placeholder="main" value="main" /></div><div class="row"><select id="project-model"><option value="">Default model</option><option>gpt-5.6</option><option>gpt-5.6-sol</option><option>gpt-5.6-terra</option><option>gpt-5.6-luna</option></select><select id="project-agent"><option value="">No default agent</option></select></div><label class="notice"><input id="project-memory" type="checkbox" checked /> Project memory enabled</label><label class="notice"><input id="project-web" type="checkbox" /> Web search by default</label><button class="primary" type="submit">Save project settings</button></form>
+        <form id="secret-form"><div class="row"><input id="secret-name" placeholder="SECRET_NAME" /><input id="secret-value" type="password" placeholder="Secret value" /></div><button class="secondary" type="submit">Save encrypted secret</button></form>
+        <form id="exec-form"><div class="row"><select id="exec-task"><option>typecheck</option><option>test</option><option>build</option><option>lint</option></select><button class="secondary" type="submit">Dispatch GitHub task</button></div></form>
+        <div id="ops-output" class="output">Select a project to inspect its integration settings.</div>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="/advanced.js"></script>
+</body>
+</html>

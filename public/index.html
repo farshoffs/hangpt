@@ -32,6 +32,7 @@
         <button class="nav-item" data-view="projects"><span>▱</span> Projects</button>
         <button class="nav-item" data-view="code"><span>⌘</span> Code</button>
         <button class="nav-item" data-view="plugins"><span>◇</span> Plugins</button>
+        <a class="nav-item" href="/advanced.html" style="text-decoration:none"><span>✦</span> Advanced</a>
       </nav>
       <div class="history-head"><span>Chats</span><button id="refresh-chats" class="icon-btn" title="Refresh">↻</button></div>
       <div id="conversation-list" class="conversation-list"></div>
@@ -61,6 +62,7 @@
             <option value="medium" selected>Medium reasoning</option>
             <option value="high">High reasoning</option>
             <option value="xhigh">Extra-high reasoning</option>
+            <option value="max">Max reasoning</option>
           </select>
           <label class="toggle"><input id="web-search" type="checkbox" /><span></span><em>Web</em></label>
         </div>
@@ -119,7 +121,7 @@
             <textarea id="file-editor" spellcheck="false" placeholder="Select or create a file"></textarea>
           </div>
           <aside class="agent-panel panel">
-            <div class="section-title"><div><h3>Code agent</h3><small>Can read and edit project files</small></div></div>
+            <div class="section-title"><div><h3>Code agent</h3><small>Can read and edit project files and linked GitHub repos</small></div></div>
             <div id="code-log" class="code-log"><div class="agent-empty">Ask the agent to build, refactor, debug, or inspect this project.</div></div>
             <form id="code-form" class="agent-composer"><textarea id="code-prompt" rows="4" placeholder="Implement the login page and update the existing files…"></textarea><div><label class="toggle"><input id="code-web-search" type="checkbox" /><span></span><em>Web</em></label><button class="primary" type="submit">Run agent</button></div></form>
           </aside>
@@ -127,7 +129,7 @@
       </section>
 
       <section id="view-plugins" class="view page-view">
-        <div class="page-header"><div><p class="eyebrow">External tools</p><h1>Plugins</h1><p>Register HTTPS webhook/API endpoints, then call them without storing their secret headers.</p></div></div>
+        <div class="page-header"><div><p class="eyebrow">External tools</p><h1>Plugins</h1><p>Register HTTPS webhook/API endpoints, then call them. Encrypted tokens can be added from Advanced.</p></div></div>
         <div class="two-column plugins-layout">
           <form id="plugin-form" class="panel form-panel">
             <h3>Add plugin</h3>
