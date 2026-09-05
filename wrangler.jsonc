@@ -12,5 +12,12 @@
   "kv_namespaces": [
     { "binding": "DATA" }
   ],
+  "workflows": [
+    {
+      "name": "hangpt-cloud-jobs",
+      "binding": "JOBS",
+      "class_name": "HanGPTWorkflow"
+    }
+  ],
   "observability": { "enabled": true }
 }

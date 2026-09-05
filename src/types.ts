@@ -3,6 +3,7 @@ export interface Env {
   ASSETS: Fetcher;
   DB?: D1Database;
   FILES?: R2Bucket;
+  JOBS?: any;
   OPENAI_API_KEY: string;
   APP_TOKEN: string;
   OPENAI_MODEL?: string;
@@ -26,3 +27,35 @@ export type MemoryItem = { id: string; text: string; scope: "global" | "project"
 export type AgentProfile = { id: string; name: string; description: string; instructions: string; model: string; reasoning: string; tools: string[]; createdAt: string; updatedAt: string };
 export type UploadMeta = { id: string; name: string; type: string; bytes: number; projectId: string | null; openaiFileId?: string | null; createdAt: string };
 export type SecretRecord = { name: string; ciphertext: string; iv: string; createdAt: string; updatedAt: string };
+
+export type BackgroundJobParams = {
+  jobId: string;
+  prompt: string;
+  title: string;
+  projectId: string | null;
+  model: string;
+  reasoning: string;
+  webSearch: boolean;
+  passes: number;
+};
+
+export type CloudJobStatus = "queued" | "running" | "paused" | "complete" | "errored" | "terminated";
+export type CloudJob = {
+  id: string;
+  title: string;
+  prompt?: string;
+  projectId: string | null;
+  model: string;
+  reasoning: string;
+  webSearch: boolean;
+  passes: number;
+  status: CloudJobStatus;
+  progress: { current: number; total: number };
+  result?: string;
+  partialResult?: string;
+  error?: string;
+  createdAt: string;
+  updatedAt: string;
+  startedAt?: string;
+  completedAt?: string;
+};

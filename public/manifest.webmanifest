@@ -1,0 +1,20 @@
+{
+  "name": "HanGPT",
+  "short_name": "HanGPT",
+  "description": "Personal AI workspace powered by Cloudflare and OpenAI",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#171717",
+  "theme_color": "#111111",
+  "orientation": "any",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "New chat", "url": "/" },
+    { "name": "Cloud Jobs", "url": "/jobs.html" },
+    { "name": "Advanced", "url": "/advanced.html" }
+  ]
+}

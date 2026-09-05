@@ -5,7 +5,13 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <meta name="color-scheme" content="dark" />
   <meta name="theme-color" content="#111111" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HanGPT" />
   <title>HanGPT</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="stylesheet" href="/styles.css" />
 </head>
 <body>
@@ -32,6 +38,7 @@
         <button class="nav-item" data-view="projects"><span>▱</span> Projects</button>
         <button class="nav-item" data-view="code"><span>⌘</span> Code</button>
         <button class="nav-item" data-view="plugins"><span>◇</span> Plugins</button>
+        <a class="nav-item" href="/jobs.html" style="text-decoration:none"><span>☁</span> Cloud Jobs</a>
         <a class="nav-item" href="/advanced.html" style="text-decoration:none"><span>✦</span> Advanced</a>
       </nav>
       <div class="history-head"><span>Chats</span><button id="refresh-chats" class="icon-btn" title="Refresh">↻</button></div>
@@ -88,7 +95,7 @@
               <button id="send-message" class="send-btn" type="submit" aria-label="Send">↑</button>
             </div>
           </div>
-          <small>HanGPT can make mistakes. Verify important information.</small>
+          <small>HanGPT can make mistakes. For tasks that must continue after you disconnect, use Cloud Jobs.</small>
         </form>
       </section>
 

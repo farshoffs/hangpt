@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#111111" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="HanGPT" />
+  <title>Cloud Jobs · HanGPT</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <style>
+    body{overflow:auto;background:#171717}.jobs-shell{max-width:1180px;margin:auto;padding:22px}.jobs-head{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-bottom:22px}.jobs-head a{color:#ddd;text-decoration:none}.jobs-grid{display:grid;grid-template-columns:minmax(300px,430px) minmax(0,1fr);gap:18px}.job-form,.job-panel{padding:18px}.job-form{display:grid;gap:13px}.job-form label{display:grid;gap:7px;color:#aaa;font-size:12px}.job-form input,.job-form textarea,.job-form select{background:#1b1b1b;border:1px solid #3b3b3b;border-radius:9px;padding:10px}.job-form textarea{min-height:190px;resize:vertical}.form-row{display:grid;grid-template-columns:1fr 1fr;gap:9px}.job-list{display:grid;gap:9px;margin-top:12px}.job-card{border:1px solid #383838;border-radius:12px;background:#202020;padding:13px;cursor:pointer}.job-card:hover{background:#272727}.job-card.active{border-color:#777}.job-card h3{font-size:14px;margin:0 0 7px}.job-meta{display:flex;gap:8px;flex-wrap:wrap;color:#888;font-size:11px}.status{padding:3px 7px;border-radius:999px;background:#333}.status.complete{background:#23452f;color:#a9e2ba}.status.errored,.status.terminated{background:#512d2d;color:#ffc1c1}.status.running{background:#243c55;color:#b9d8ff}.job-detail{margin-top:16px}.job-result{white-space:pre-wrap;word-break:break-word;background:#141414;border:1px solid #303030;border-radius:10px;padding:14px;min-height:180px;max-height:60vh;overflow:auto;line-height:1.55}.job-actions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}.job-actions button{border:1px solid #464646;background:#303030;border-radius:8px;padding:8px 11px}.cloud-note{background:#1c2730;border:1px solid #2d4558;padding:12px;border-radius:10px;color:#bed8eb;font-size:12px;line-height:1.5}.offline-banner{display:none;margin-bottom:12px;background:#4d3820;color:#ffd6a6;border:1px solid #76542a;border-radius:10px;padding:10px}.offline .offline-banner{display:block}.auth-mini{display:flex;gap:8px;margin-bottom:14px}.auth-mini input{flex:1;background:#111;border:1px solid #3b3b3b;border-radius:8px;padding:9px}.muted{color:#888}.progress{height:6px;background:#303030;border-radius:999px;overflow:hidden;margin-top:8px}.progress i{display:block;height:100%;background:#ddd;width:0}.install-tip{font-size:12px;color:#999;margin-top:10px}.empty{color:#777;padding:22px 4px}@media(max-width:760px){.jobs-shell{padding:14px}.jobs-grid{grid-template-columns:1fr}.jobs-head h1{font-size:22px}.form-row{grid-template-columns:1fr}.job-result{max-height:none}.jobs-head{align-items:flex-start}}
+  </style>
+</head>
+<body>
+  <main class="jobs-shell">
+    <header class="jobs-head">
+      <div><p class="eyebrow">Durable execution</p><h1>Cloud Jobs</h1><p class="muted">Start work once. Cloudflare continues even if this device disconnects.</p></div>
+      <a href="/">← HanGPT</a>
+    </header>
+    <div class="offline-banner">Your device is offline. Existing cloud jobs continue running. Cached status is shown until you reconnect.</div>
+    <div id="auth-mini" class="auth-mini hidden"><input id="token" type="password" placeholder="APP_TOKEN" autocomplete="current-password"><button id="save-token" class="primary">Connect</button></div>
+    <div class="jobs-grid">
+      <section class="panel job-form">
+        <div class="cloud-note"><strong>Cloud mode:</strong> after HanGPT accepts the job, you can close Safari, close the installed app, switch off Wi-Fi/mobile data, or restart your phone. The Workflow remains in Cloudflare.</div>
+        <label>Task<textarea id="prompt" placeholder="Research this topic deeply, compare the options, verify the facts, and give me a final recommendation..."></textarea></label>
+        <label>Project<select id="project"><option value="">No project</option></select></label>
+        <div class="form-row">
+          <label>Model<select id="model"><option value="gpt-5.6">GPT-5.6</option><option value="gpt-5.6-sol">GPT-5.6 Sol</option><option value="gpt-5.6-terra">GPT-5.6 Terra</option><option value="gpt-5.6-luna">GPT-5.6 Luna</option></select></label>
+          <label>Reasoning<select id="reasoning"><option value="medium">Medium</option><option value="high">High</option><option value="xhigh">Extra high</option><option value="max">Max</option></select></label>
+        </div>
+        <div class="form-row">
+          <label>Passes<select id="passes"><option value="1">1 pass</option><option value="2">2 passes</option><option value="3">3 passes</option><option value="4">4 passes</option><option value="5">5 passes</option></select></label>
+          <label style="align-content:end"><span><input id="web" type="checkbox"> Use web search</span></label>
+        </div>
+        <button id="start" class="primary wide">Start cloud job</button>
+        <div class="install-tip">On iPhone: open HanGPT in Safari → Share → <strong>Add to Home Screen</strong> for an app-like icon and standalone window.</div>
+      </section>
+      <section class="panel job-panel">
+        <div class="section-title"><div><p class="eyebrow">Server-side</p><h3>Jobs</h3></div><button id="refresh" class="secondary">Refresh</button></div>
+        <div id="job-list" class="job-list"></div>
+        <div id="job-detail" class="job-detail hidden">
+          <div class="section-title"><div><h3 id="detail-title"></h3><small id="detail-meta"></small></div><span id="detail-status" class="status"></span></div>
+          <div class="progress"><i id="progress-bar"></i></div>
+          <div class="job-actions"><button data-action="pause">Pause</button><button data-action="resume">Resume</button><button data-action="restart">Restart</button><button data-action="terminate">Terminate</button></div>
+          <pre id="result" class="job-result">No result yet.</pre>
+        </div>
+      </section>
+    </div>
+  </main>
+  <script type="module" src="/jobs.js"></script>
+  <script type="module" src="/pwa-register.js"></script>
+</body>
+</html>

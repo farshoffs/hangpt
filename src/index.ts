@@ -2,6 +2,9 @@ import app from "./router";
 import type { Env, PluginManifest } from "./types";
 import { isAuthorized, json, bodyJson, cleanText, loadIndex, upsertIndex, getProjectSecret } from "./core";
 import { oauthStart, oauthSetClientSecret, oauthCallback } from "./oauth";
+import { handleBackgroundApi, HanGPTWorkflow } from "./background";
+
+export { HanGPTWorkflow };
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
@@ -9,6 +12,11 @@ export default {
     const path = url.pathname;
     const callback = path.match(/^\/api\/plugins\/([^/]+)\/oauth\/callback$/);
     if (callback && request.method === "GET") return oauthCallback(request, env, callback[1]);
+
+    if (path === "/api/jobs" || /^\/api\/jobs\//.test(path)) {
+      if (!env.APP_TOKEN || !isAuthorized(request, env)) return json({ error: "Unauthorized" }, 401);
+      return handleBackgroundApi(request, env);
+    }
 
     const oauthRoute = path.match(/^\/api\/plugins\/([^/]+)\/oauth\/(config|secret|start)$/);
     const oauthCall = path.match(/^\/api\/plugins\/([^/]+)\/call$/);
